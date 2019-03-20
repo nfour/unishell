@@ -3,15 +3,16 @@ import { Unishell } from '../Unishell';
 // tslint:disable: no-unused-expression
 
 test('Unishell API can be accessed as the interfaces define it', async () => {
-
   const unishell = new Unishell({});
 
+  /** Produces a `ssh2` powered client */
   const ssh = unishell.ssh({
     host: 'localhost',
     user: 'foo',
     identity: '',
   });
 
+  /** Produces a local `execa` powered client */
   const local = unishell.local({
     cwd: __dirname,
   });
@@ -20,11 +21,11 @@ test('Unishell API can be accessed as the interfaces define it', async () => {
 
   const r1 = await ssh.exec('echo foo');
 
-  r1;
+  r1; // "foo"
 
   const r2 = await ssh.exec('echo foo').details();
 
-  r2.output;
+  r2.output; // "foo"
 
   await ssh.exec('echo foo').pipe({ stdout: process.stdout });
 
@@ -36,13 +37,16 @@ test('Unishell API can be accessed as the interfaces define it', async () => {
 
   r4;
 
-  const r5 = await ssh.exec('echo foo').reject();
+  const r5 = await ssh.exec('notARealCommand');
 
-  r5.trim;
+  r5; // "command not found: notARealCommand"
 
-  const r6 = await ssh.exec('echo foo').reject().details();
-
-  r6.output;
+  try {
+    await ssh.exec('notARealCommand').reject().details();
+  } catch (r6) {
+    r6;
+    // { stdout: "", stderr: "command not found: notARealCommand", exitCode: 127, ... }
+  }
 
   const r7 = await ssh.shell(async (exec) => {
     exec('').reject;
@@ -52,6 +56,10 @@ test('Unishell API can be accessed as the interfaces define it', async () => {
   });
 
   r7;
+
+  const r8 = await ssh.exec('echo foo').reject(); // doesnt actually reject, as `echo` wont error
+
+  r8; // "foo"
 
   await ssh.shell(async (exec) => {
     await exec('echo foo');
@@ -63,17 +71,24 @@ test('Unishell API can be accessed as the interfaces define it', async () => {
     await exec('exit');
   });
 
+  /** Piping the parent node CLI input into the ssh session's stdin */
   process.stdin.pipe(sessionStream.stdin);
+
+  /** Piping the ssh session's stdout and stderr into the parent node process */
   sessionStream.pipe(process);
 
   await sessionStream; // Shell session is over
 
+  await local.connect();
+
+  /** Run commands locally */
   await local.shell(async (exec) => {
     const r10 = await exec('ls -lsah').details();
 
     r10.cmd;
   });
 
+  /** Access the `ssh2` Client to do advanced operations */
   const ssh2 = ssh.client();
 
   ssh2.forwardIn;

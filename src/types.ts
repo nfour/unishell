@@ -51,3 +51,8 @@ export interface IExecResult {
   /** Exit code */
   readonly code: number;
 }
+
+export interface IExecResultRejection extends IExecResult {
+  /** Identical to `output` */
+  message: string;
+}
