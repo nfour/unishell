@@ -1,0 +1,6 @@
+{
+  "extends": "tslint-config-temando",
+  "rules": {
+    "no-console": false
+  }
+}
