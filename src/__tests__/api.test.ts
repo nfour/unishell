@@ -3,7 +3,7 @@ import { Unishell } from '../Unishell';
 // tslint:disable: no-unused-expression
 
 test('Unishell API can be accessed as the interfaces define it', async () => {
-  const unishell = new Unishell({});
+  const unishell = new Unishell({ /* global options */ });
 
   /** Produces a `ssh2` powered client */
   const ssh = unishell.ssh({

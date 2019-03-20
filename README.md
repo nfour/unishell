@@ -21,7 +21,7 @@ Got tired of having to pick and choose which library to interact with the CLI. T
 ```ts
 import { Unishell } from 'unishell';
 
-const unishell = new Unishell({});
+const unishell = new Unishell({ /* global options */ });
 
 /** Produces a `ssh2` powered client */
 const ssh = unishell.ssh({
