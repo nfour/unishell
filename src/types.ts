@@ -1,33 +1,53 @@
+import { ReadStream, WriteStream } from 'fs';
+import { Client as SshClient } from 'ssh2';
+import { Stream } from 'stream';
+
 export interface IUnishellClient {
-  shell: IUnishellShell;
-  connect (): any;
-  exec (): any;
+  shell: IUnishellShellSession;
+  exec: IExec;
+  connect (): Promise<void>;
 }
 
-export interface IUnishellShell {
-  (exec: IExec): Promise<any>;
-  pipe (): any;
+export interface IUnishellSshClient extends IUnishellClient {
+  client (): SshClient;
 }
 
-export interface IExec {
-  (cmd: string): Promise<any>;
-  reject (): any;
-  pipe (): any;
+/** All calls to the provided `exec` are executed within the session */
+export type IUnishellShellSession = (
+  cb: (exec: IExec) => Promise<any>,
+) => (
+  { pipe: IFluidPipe } & IProcessIo & Promise<void>
+);
 
+export interface IExecOptions {}
+export type IExec = (cmd: string, options?: Partial<IExecOptions>) => IExecFluidReturn;
+
+export interface IExecFluidReturn extends Promise<string> {
+  pipe: IFluidPipe;
+  details (): Promise<IExecResult>;
+  reject (): IExecFluidReturn;
+}
+
+export type IFluidPipe = (io: Partial<IProcessIo>) => Promise<void> & Stream;
+
+export interface IProcessIo {
+  stdout: NodeJS.WriteStream;
+  stderr: NodeJS.WriteStream;
+  stdin: NodeJS.ReadStream;
 }
 
 export interface IExecResult {
   /** Whether the command was exited non-0 */
-  killed: boolean;
+  readonly rejected: boolean;
 
   /** Combined stdout and stderr */
-  output: string;
-  stdout: string;
-  stderr: string;
+  readonly output: string;
+  readonly stdout: string;
+  readonly stderr: string;
 
   /** Invoking command */
-  cmd: string;
+  readonly cmd: string;
 
   /** Exit code */
-  code: number;
+  readonly code: number;
 }
