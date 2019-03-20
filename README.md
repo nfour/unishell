@@ -35,6 +35,8 @@ const local = unishell.local({
   cwd: __dirname,
 });
 
+// Both `ssh` and `local` have identical interfaces!
+
 void (async () => {
   await ssh.connect();
 
@@ -42,6 +44,21 @@ void (async () => {
   // Basic usage
   //
 
+
+  const output = await ssh.exec('echo foo');
+  // "foo"
+
+  const { output, stdout, stderr, code, killed, cmd }  = await ssh.exec('echo foo').details();
+  // { output: "foo", stdout: "foo", stderr: "", code: 0, killed: false, cmd: "echo foo" }
+
+  await ssh.exec('echo foo').pipe(process);
+  
+  const stream = ssh.exec('echo foo').pipe(process);
+  // ReadableStream & Promise
+
+  await stream;
+
+  /** A session is created, with each command operating in the same session */
   await ssh.shell(async (exec) => {
     const { stdout } = await exec('echo foo');
     // > { stdout: "foo", ... }
