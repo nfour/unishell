@@ -1,6 +1,20 @@
 # Unishell
 
+- [Why](#why)
 - [Examples](#examples)
+
+## Why
+
+Got tired of having to pick and choose which library to interact with the CLI. This attempts to unify it.
+
+**Goals**:
+- Be as terse and as close to a bash script as reasonable
+- Normalize local and remote CLI interactions
+
+**Usage examples**:
+- Regular CLI interaction with a terser interface
+- Deployment scripts for remote SSH targets
+
 
 ## Examples
 
