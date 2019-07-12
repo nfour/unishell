@@ -3,7 +3,7 @@
   "version": "1.0.0",
   "dependencies": {
     "execa": "~1.0.0",
-    "lodash": "~4.17.11",
+    "lodash": "~4.17.13",
     "ssh2": "~0.8.2"
   },
   "devDependencies": {
